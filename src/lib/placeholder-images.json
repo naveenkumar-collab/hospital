@@ -1,3 +1,46 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "staff-1",
+      "description": "Photo of Dr. Emily Carter",
+      "imageUrl": "https://images.unsplash.com/photo-1685022036574-12bffde5e2b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8d29tYW4lMjBkb2N0b3J8ZW58MHx8fHwxNzY5NzY2Mjk2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman doctor"
+    },
+    {
+      "id": "staff-2",
+      "description": "Photo of Dr. Ben Adams",
+      "imageUrl": "https://images.unsplash.com/photo-1722938203650-99afb12419f8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxtYW4lMjBkb2N0b3J8ZW58MHx8fHwxNzY5Njk4NTQxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man doctor"
+    },
+    {
+      "id": "staff-3",
+      "description": "Photo of Nurse Olivia White",
+      "imageUrl": "https://images.unsplash.com/photo-1758575514487-0390fcacc339?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx3b21hbiUyMG51cnNlfGVufDB8fHx8MTc2OTY5ODU0MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman nurse"
+    },
+    {
+      "id": "staff-4",
+      "description": "Photo of Dr. Jessica Lee",
+      "imageUrl": "https://images.unsplash.com/photo-1632054226752-b1b40867f7a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx3b21hbiUyMGRvY3RvciUyMHByb2Zlc3Npb25hbHxlbnwwfHx8fDE3Njk3NzcwMDN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman doctor professional"
+    },
+    {
+      "id": "staff-5",
+      "description": "Photo of Admin Mark Chen",
+      "imageUrl": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxtYW4lMjBwcm9mZXNzaW9uYWx8ZW58MHx8fHwxNzY5Njg2MDM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man professional"
+    },
+    {
+      "id": "staff-6",
+      "description": "Photo of Nurse Sam Taylor",
+      "imageUrl": "https://images.unsplash.com/photo-1712232420830-4a44967ba8d6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWFuJTIwbnVyc2V8ZW58MHx8fHwxNzY5Nzc2MTI5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man nurse"
+    },
+    {
+      "id": "user-avatar",
+      "description": "User avatar",
+      "imageUrl": "https://images.unsplash.com/photo-1635131902146-6957477a4ff4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwZXJzb24lMjBzbWlsaW5nfGVufDB8fHx8MTc2OTcwNDg1NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person smiling"
+    }
+  ]
 }
