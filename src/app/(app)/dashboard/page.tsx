@@ -156,7 +156,7 @@ export default function DashboardPage() {
              <ChartContainer config={{
                 revenue: {
                   label: "Revenue",
-                  color: "hsl(var(--primary))",
+                  color: "blue",
                 },
               }} className="h-[200px] w-full">
               <BarChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 0 }}>
