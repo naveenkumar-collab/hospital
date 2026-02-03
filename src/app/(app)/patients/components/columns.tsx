@@ -32,7 +32,7 @@ export const columns: ColumnDef<Patient>[] = [
   },
   {
     accessorKey: "name",
-    header: "Name",
+    header: "NAVEEN KUMAR",
   },
   {
     accessorKey: "age",
