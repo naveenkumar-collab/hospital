@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -21,6 +24,12 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 export default function AppointmentsPage() {
+  const [selectedDate, setSelectedDate] = useState<Date>();
+
+  useEffect(() => {
+    setSelectedDate(new Date());
+  }, []);
+
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-8">
       <div className="md:col-span-2">
@@ -88,7 +97,8 @@ export default function AppointmentsPage() {
           <CardContent className="flex justify-center">
             <Calendar
               mode="single"
-              selected={new Date()}
+              selected={selectedDate}
+              onSelect={setSelectedDate}
               className="rounded-md"
             />
           </CardContent>
