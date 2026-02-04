@@ -1,3 +1,4 @@
+
 import type { Patient, Staff, Appointment, Invoice } from "./types";
 import { PlaceHolderImages } from "./placeholder-images";
 
@@ -33,8 +34,8 @@ export const invoices: Invoice[] = [
   { id: "INV002", patientName: "Bob Williams", amount: 400, date: "2024-05-12", status: "Unpaid" },
   { id: "INV003", patientName: "Charlie Brown", amount: 150, date: "2024-04-22", status: "Paid" },
   { id: "INV004", patientName: "Diana Prince", amount: 75, date: "2024-05-15", status: "Unpaid" },
-  { id: "INV005", name: "Ethan Hunt", amount: 800, date: "2024-03-30", status: "Paid" },
-  { id: "INV006", name: "Fiona Glenanne", amount: 320, date: "2024-04-15", status: "Overdue" },
+  { id: "INV005", patientName: "Ethan Hunt", amount: 800, date: "2024-03-30", status: "Paid" },
+  { id: "INV006", patientName: "Fiona Glenanne", amount: 320, date: "2024-04-15", status: "Overdue" },
 ];
 
 export const getTodaysAppointments = () => {
