@@ -180,7 +180,7 @@ export default function LoginPage() {
         </CardContent>
         <CardFooter className="flex-col items-center gap-2">
            <div className="text-center text-sm">
-            <Link href={`/${searchParams.toString()}`} className="underline">
+            <Link href={`/?${searchParams.toString()}`} className="underline">
               Are you a patient? Go back.
             </Link>
           </div>
