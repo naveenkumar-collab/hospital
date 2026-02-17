@@ -65,16 +65,18 @@ export default function LoginPage() {
   useEffect(() => {
     if (!auth) return;
     // Set up reCAPTCHA verifier
-    window.recaptchaVerifier = new RecaptchaVerifier(
-      auth,
-      'recaptcha-container',
-      {
-        size: 'invisible',
-        callback: () => {
-          // reCAPTCHA solved, allow signInWithPhoneNumber.
-        },
-      }
-    );
+    if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(
+        auth,
+        'recaptcha-container',
+        {
+            size: 'invisible',
+            callback: () => {
+            // reCAPTCHA solved, allow signInWithPhoneNumber.
+            },
+        }
+        );
+    }
   }, [auth]);
 
   const handlePhoneSignIn = async (e: React.FormEvent) => {
@@ -89,10 +91,14 @@ export default function LoginPage() {
       toast({ title: 'OTP sent successfully!' });
     } catch (error: any) {
       console.error(error);
+      let description = error.message;
+      if (error.code === 'auth/operation-not-allowed') {
+        description = 'Phone number sign-in is not enabled. Please enable it in your Firebase console under Authentication > Sign-in method.';
+      }
       toast({
         variant: 'destructive',
         title: 'Failed to send OTP',
-        description: error.message,
+        description: description,
       });
       // Reset reCAPTCHA
        if (window.recaptchaVerifier) {
@@ -407,5 +413,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    
