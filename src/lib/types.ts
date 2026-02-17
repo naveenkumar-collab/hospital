@@ -7,6 +7,7 @@ export type Patient = {
   gender: "Male" | "Female" | "Other";
   lastVisit: string;
   status: "Active" | "Recovered" | "Deceased";
+  avatar?: string;
 };
 
 export type Appointment = {
