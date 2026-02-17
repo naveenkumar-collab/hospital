@@ -107,47 +107,43 @@ service cloud.firestore {
     // ----------------------------------------------------------------------
 
     match /patients/{patientId} {
-      allow get: if isOwner(patientId) || isAdmin() || isDoctor();
-      allow list: if isAdmin() || isDoctor();
+      allow read: if true; // DEMO: Allow public read
       allow create, update: if isOwner(patientId) || isAdmin();
       allow delete: if isAdmin();
 
       // Subcollections
       match /bills/{billId} {
-         allow get: if isOwner(patientId) || isAdmin();
-         allow list: if isOwner(patientId) || isAdmin();
+         allow read: if true; // DEMO: Allow public read
          allow create, update, delete: if isAdmin();
       }
       match /medicalRecords/{recordId} {
-        allow get, list: if isOwner(patientId) || isDoctor() || isAdmin();
+        allow read: if true; // DEMO: Allow public read
         allow create, update: if isDoctor() || isAdmin();
         allow delete: if isAdmin();
       }
     }
     
     match /staff/{staffId} {
-      allow get: if isSignedIn();
-      allow list: if isSignedIn();
+      allow read: if true; // DEMO: Allow public read
       allow create: if isOwner(staffId) || isAdmin();
       allow update: if isOwner(staffId) || isAdmin();
       allow delete: if isAdmin();
     }
 
     match /departments/{departmentId} {
-      allow get, list: if isSignedIn();
+      allow read: if true; // DEMO: Allow public read
       allow create, update, delete: if isAdmin();
     }
 
     match /appointments/{appointmentId} {
-      allow get: if isOwner(resource.data.patientId) || isOwner(resource.data.staffId) || isAdmin();
-      allow list: if isAdmin();
+      allow read: if true; // DEMO: Allow public read
       allow create: if isSignedIn();
       allow update: if isOwner(resource.data.patientId) || isOwner(resource.data.staffId) || isAdmin();
       allow delete: if isAdmin();
     }
 
     match /services/{serviceId} {
-      allow get, list: if isSignedIn();
+      allow read: if true; // DEMO: Allow public read
       allow create, update, delete: if isAdmin();
     }
     
@@ -160,7 +156,7 @@ service cloud.firestore {
     
     // Allow collection group query for bills for admins
     match /{path=**}/bills/{billId} {
-      allow read: if isAdmin();
+      allow read: if true; // DEMO: Allow public read
     }
   }
 }
