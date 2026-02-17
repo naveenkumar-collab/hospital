@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth, useFirestore } from '@/firebase';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
@@ -21,7 +21,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export default function PatientLoginPage() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [errorState, setErrorState] = useState<string | null>(null);
   const auth = useAuth();
   const firestore = useFirestore();
@@ -32,7 +32,6 @@ export default function PatientLoginPage() {
   const handleGoogleSignIn = useCallback(async () => {
     if (!auth || !firestore) {
       setErrorState("Firebase is not ready. Please try again in a moment.");
-      setIsLoading(false);
       return;
     }
     
@@ -80,9 +79,7 @@ export default function PatientLoginPage() {
       setIsLoading(false);
       let description = "An unexpected error occurred.";
       if (error.code === 'auth/popup-closed-by-user') {
-        description = "The sign-in window was closed before completing.";
-        setErrorState(description);
-        router.push('/'); // Go back to selection screen
+        // This is not an error, the user just closed the popup.
         return;
       } else if (error.code === 'auth/operation-not-allowed') {
         description = "Google Sign-In is not enabled for this project.";
@@ -98,34 +95,26 @@ export default function PatientLoginPage() {
     }
   }, [auth, firestore, router, searchParams, toast]);
 
-  useEffect(() => {
-    handleGoogleSignIn();
-  }, [handleGoogleSignIn]);
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <Card className="w-full max-w-sm text-center">
         <CardHeader>
           <CardTitle className="text-2xl">Patient Sign-In</CardTitle>
           <CardDescription>
-            {isLoading 
-              ? "Redirecting you to Google to sign in securely..."
-              : "Please use the button below to sign in."}
+            Please use the button below to sign in with your Google account.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex justify-center items-center flex-col gap-4">
-            {isLoading && <Loader2 className="h-10 w-10 animate-spin text-primary" />}
-            
-            {!isLoading && (
+            {isLoading ? (
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            ) : (
               <Button variant="default" className="w-full" type="button" onClick={handleGoogleSignIn}>
                 <GoogleIcon className="mr-2 h-4 w-4" />
                 Sign in with Google
               </Button>
             )}
-
             {errorState && <p className="text-sm text-destructive">{errorState}</p>}
-
           </div>
         </CardContent>
          <CardFooter>
