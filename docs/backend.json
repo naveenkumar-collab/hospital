@@ -345,7 +345,7 @@
         },
         "description": {
           "type": "string",
-          "description": "A detailed description of the service."
+          "description": "A detailed description of the.
         },
         "price": {
           "type": "number",
@@ -574,7 +574,8 @@
     "providers": [
       "password",
       "anonymous",
-      "google.com"
+      "google.com",
+      "phone"
     ]
   },
   "firestore": {
@@ -763,3 +764,5 @@
     "reasoning": "The Firestore structure for MediTrack is designed with a strong emphasis on Authorization Independence, Structural Segregation, and consistent Access Modeling to ensure robust security rules and efficient queries. The core strategy is to denormalize authorization context directly into documents, eliminating the need for `get()` calls in security rules for checking associated data, thereby enhancing rule simplicity, debuggability, and support for atomic operations.\n\n**Authorization Independence & Denormalization:**\n*   For entities like `MedicalRecord`, `Bill`, and `BillItem` which are tightly bound to a `Patient`, they are structured as subcollections under `/patients/{patientId}/...`. This inherently denormalizes `patientId` into the path, making ownership checks (`request.auth.uid == patientId`) straightforward and `get()`-free.\n*   For `Appointment` documents, `patientId` and `staffId` are explicitly included in the document. This allows a patient to access their own appointments (`resource.data.patientId == request.auth.uid`) and a staff member to access their assigned appointments (`resource.data.staffId == request.auth.uid`) without needing to perform `get()` operations on other documents.\n*   For `Notification` documents, which can target individual staff or entire departments, the `recipientStaffId` is directly in the document for individual access. For department-wide notifications, a new denormalized field, `authorizedDepartmentStaffIds`, is proposed. This field would be a map (`{staffId1: true, staffId2: true}`) containing all `staffId`s belonging to the `recipientDepartmentId`. This crucial denormalization ensures that authorization for department notifications can be checked directly within the `Notification` document (`resource.data.authorizedDepartmentStaffIds[request.auth.uid] == true`), completely avoiding `get()` calls to the `staff` or `department` collections in the rules. This requires a Cloud Function to populate and maintain this map when staff join/leave departments or when department-targeted notifications are created.\n\n**Structural Segregation & QAPs (Queries as Authorization Primitives):**\n*   Each primary entity (`Patient`, `Staff`, `Department`, `Service`) gets its own top-level collection. This ensures homogeneous security posture within each collection. For example, all documents in `/patients` share the primary security requirement that a patient can only manage their own profile, while admin staff can manage all. This simplifies `list` operations (QAPs) because rules can be applied uniformly.\n*   Global roles (`roles_admin`, `roles_doctor`) are implemented using dedicated collections. Existence checks (`exists(/roles_admin/$(request.auth.uid))`) are used to grant broad access, enabling efficient `list` operations for administrative or specialized staff without complex `get()` chains.\n*   The structure supports QAPs by allowing users to efficiently query for data they are authorized to access: e.g., a patient can query `/patients/{request.auth.uid}/appointments` (or `/appointments` with `where patientId == request.auth.uid`), a staff member can query `/appointments` with `where staffId == request.auth.uid`, and administrative staff (identified by `roles_admin/{uid}`) can `list` all documents in relevant collections.\n\n**Access Modeling & Data Clarity:**\n*   **Private Data:** Path-based ownership is used for patient-specific nested data (`/patients/{patientId}/medicalRecords`, `/patients/{patientId}/bills`, `/patients/{patientId}/bills/{billId}/billItems`). This provides clear ownership and simplifies rules.\n*   **Collaborative Data:** While direct membership maps aren't used for `Department` documents themselves, the concept is applied to `Notification` through the denormalized `authorizedDepartmentStaffIds` map for department-level collaboration. For general collaborative documents like `Appointment`, `patientId` and `staffId` fields facilitate authorization.\n*   **Global Roles (DBAC):** Dedicated `roles_admin/{staffId}` and `roles_doctor/{staffId}` collections are used. This makes global role assignments explicit and rule evaluation simple, based on document existence.\n\nThis design prioritizes secure, scalable, and debuggable Firestore rules by making authorization intent explicit through careful structural choices and strategic denormalization, fully adhering to the core design principles."
   }
 }
+
+    
