@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth, useFirestore } from '@/firebase';
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -46,6 +46,8 @@ export default function SignupPage() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+      
+      await updateProfile(user, { displayName: `${firstName} ${lastName}` });
 
       if (role === 'patient') {
         const patientRef = doc(firestore, 'patients', user.uid);
@@ -56,10 +58,12 @@ export default function SignupPage() {
           email,
           dateOfBirth: '1990-01-01', // Default value
           gender: 'Other', // Default value
-          lastVisit: new Date().toISOString().split('T')[0],
+          contactNumber: 'N/A',
+          address: 'N/A',
           status: 'Active',
           avatar: `https://picsum.photos/seed/${user.uid}/120/120`,
         });
+        router.push('/patient/dashboard');
       } else {
         const staffRef = doc(firestore, 'staff', user.uid);
         await setDoc(staffRef, {
@@ -71,10 +75,10 @@ export default function SignupPage() {
           departmentId: 'General', // Default department
           avatar: `https://picsum.photos/seed/${user.uid}/120/120`,
         });
+        router.push('/dashboard');
       }
       
       toast({ title: "Account created successfully!" });
-      router.push('/dashboard');
     } catch (error: any) {
       console.error(error);
       toast({
@@ -95,30 +99,36 @@ export default function SignupPage() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      const patientRef = doc(firestore, 'patients', user.uid);
+      // By default, a Google Sign-In user is a patient unless they are already in the staff list
       const staffRef = doc(firestore, 'staff', user.uid);
-      const patientSnap = await getDoc(patientRef);
       const staffSnap = await getDoc(staffRef);
 
-      if (!patientSnap.exists() && !staffSnap.exists()) {
-        const [firstName, ...lastNameParts] = user.displayName?.split(' ') || [];
-        const lastName = lastNameParts.join(' ');
-        
-        await setDoc(patientRef, {
-          id: user.uid,
-          firstName: firstName || 'New',
-          lastName: lastName || 'User',
-          email: user.email,
-          dateOfBirth: '1990-01-01',
-          gender: 'Other',
-          lastVisit: new Date().toISOString().split('T')[0],
-          status: 'Active',
-          avatar: user.photoURL || `https://picsum.photos/seed/${user.uid}/120/120`,
-        });
+      if (staffSnap.exists()) {
+        router.push('/dashboard');
+      } else {
+        const patientRef = doc(firestore, 'patients', user.uid);
+        const patientSnap = await getDoc(patientRef);
+        if (!patientSnap.exists()) {
+          const [firstName, ...lastNameParts] = user.displayName?.split(' ') || [];
+          const lastName = lastNameParts.join(' ');
+          
+          await setDoc(patientRef, {
+            id: user.uid,
+            firstName: firstName || 'New',
+            lastName: lastName || 'User',
+            email: user.email,
+            dateOfBirth: '1990-01-01',
+            gender: 'Other',
+            contactNumber: user.phoneNumber || 'N/A',
+            address: 'N/A',
+            status: 'Active',
+            avatar: user.photoURL,
+          });
+        }
+        router.push('/patient/dashboard');
       }
       
       toast({ title: "Account created successfully!" });
-      router.push('/dashboard');
     } catch (error: any) {
       console.error(error);
       let description = error.message;

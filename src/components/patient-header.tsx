@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -6,15 +5,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
   Home,
-  Users,
   Calendar,
-  Wallet,
   FileText,
-  BrainCircuit,
-  BarChart3,
-  PanelLeft,
-  Hospital,
+  CreditCard,
+  User as UserIcon,
   LogOut,
+  PanelLeft,
+  Stethoscope,
 } from 'lucide-react';
 import {
   Sheet,
@@ -43,16 +40,14 @@ import { cn } from '@/lib/utils';
 import { useAuth, useUser } from '@/firebase';
 
 const navItems = [
-  { href: '/dashboard', icon: Home, label: 'Dashboard' },
-  { href: '/patients', icon: Users, label: 'Patients' },
-  { href: '/appointments', icon: Calendar, label: 'Appointments' },
-  { href: '/billing', icon: Wallet, label: 'Billing' },
-  { href: '/staff', icon: FileText, label: 'Staff' },
-  { href: '/smart-routing', icon: BrainCircuit, label: 'Smart Routing' },
-  { href: '/reports', icon: BarChart3, label: 'Reports' },
+  { href: '/patient/dashboard', icon: Home, label: 'Home' },
+  { href: '/patient/appointments', icon: Calendar, label: 'Appointments' },
+  { href: '/patient/records', icon: FileText, label: 'Medical Records' },
+  { href: '/patient/billing', icon: CreditCard, label: 'Billing' },
+  { href: '/patient/profile', icon: UserIcon, label: 'Profile' },
 ];
 
-export function Header() {
+export function PatientHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const auth = useAuth();
@@ -63,7 +58,7 @@ export function Header() {
 
   const handleLogout = async () => {
     if (auth) {
-        await auth.signOut();
+      await auth.signOut();
     }
     router.push('/login');
   };
@@ -83,8 +78,8 @@ export function Header() {
               href="#"
               className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
             >
-              <Hospital className="h-5 w-5 transition-all group-hover:scale-110" />
-              <span className="sr-only">MediTrack</span>
+              <Stethoscope className="h-5 w-5 transition-all group-hover:scale-110" />
+              <span className="sr-only">MediTrack Patient</span>
             </Link>
             {navItems.map((item) => (
               <Link
@@ -106,10 +101,10 @@ export function Header() {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/patient/dashboard">Patient</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
-          {breadcrumbItem && breadcrumbItem.href !== '/dashboard' && (
+          {breadcrumbItem && breadcrumbItem.href !== '/patient/dashboard' && (
             <>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -120,7 +115,6 @@ export function Header() {
         </BreadcrumbList>
       </Breadcrumb>
       <div className="relative ml-auto flex-1 md:grow-0">
-        {/* Can add a search bar here if needed */}
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -142,7 +136,7 @@ export function Header() {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>{user?.email || 'My Account'}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Settings</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push('/patient/profile')}>Profile</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>

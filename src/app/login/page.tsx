@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth, useFirestore } from '@/firebase';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -30,16 +30,29 @@ export default function LoginPage() {
   const auth = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/dashboard';
   const { toast } = useToast();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth) return;
+    if (!auth || !firestore) return;
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      const staffRef = doc(firestore, 'staff', user.uid);
+      const staffSnap = await getDoc(staffRef);
+      
       toast({ title: "Signed in successfully!" });
-      router.push('/dashboard');
+
+      if (staffSnap.exists()) {
+        router.push(redirectUrl.startsWith('/patient') ? '/dashboard' : redirectUrl);
+      } else {
+        router.push(redirectUrl.startsWith('/patient') ? redirectUrl : '/patient/dashboard');
+      }
+
     } catch (error: any) {
       console.error(error);
       toast({
@@ -60,30 +73,36 @@ export default function LoginPage() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      const patientRef = doc(firestore, 'patients', user.uid);
       const staffRef = doc(firestore, 'staff', user.uid);
-      const patientSnap = await getDoc(patientRef);
       const staffSnap = await getDoc(staffRef);
 
-      if (!patientSnap.exists() && !staffSnap.exists()) {
-        const [firstName, ...lastNameParts] = user.displayName?.split(' ') || ['', ''];
-        const lastName = lastNameParts.join(' ');
-        
-        await setDoc(patientRef, {
-          id: user.uid,
-          firstName: firstName || 'New',
-          lastName: lastName || 'User',
-          email: user.email,
-          dateOfBirth: '1990-01-01',
-          gender: 'Other',
-          lastVisit: new Date().toISOString().split('T')[0],
-          status: 'Active',
-          avatar: user.photoURL || `https://picsum.photos/seed/${user.uid}/120/120`,
-        });
-      }
-      
       toast({ title: "Signed in successfully!" });
-      router.push('/dashboard');
+      
+      if (staffSnap.exists()) {
+        router.push(redirectUrl.startsWith('/patient') ? '/dashboard' : redirectUrl);
+      } else {
+        const patientRef = doc(firestore, 'patients', user.uid);
+        const patientSnap = await getDoc(patientRef);
+
+        if (!patientSnap.exists()) {
+          const [firstName, ...lastNameParts] = user.displayName?.split(' ') || ['', ''];
+          const lastName = lastNameParts.join(' ');
+          
+          await setDoc(patientRef, {
+            id: user.uid,
+            firstName: firstName || 'New',
+            lastName: lastName || 'User',
+            email: user.email,
+            dateOfBirth: '1990-01-01',
+            gender: 'Other',
+            contactNumber: user.phoneNumber || 'N/A',
+            address: 'N/A',
+            status: 'Active',
+            avatar: user.photoURL,
+          });
+        }
+        router.push(redirectUrl.startsWith('/patient') ? redirectUrl : '/patient/dashboard');
+      }
     } catch (error: any) {
       console.error(error);
       let description = error.message;

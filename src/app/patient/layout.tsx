@@ -2,13 +2,13 @@
 
 import { useEffect } from 'react';
 import { redirect, usePathname } from 'next/navigation';
-import { Header } from '@/components/header';
-import { MainSidebar } from '@/components/main-sidebar';
+import { PatientHeader } from '@/components/patient-header';
+import { PatientSidebar } from '@/components/patient-sidebar';
 import { useUser, useFirestore } from '@/firebase';
 import { Loader2 } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 
-export default function AppLayout({
+export default function PatientLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -21,12 +21,12 @@ export default function AppLayout({
     if (!isUserLoading && !user) {
       redirect(`/login?redirect=${pathname}`);
     } else if (!isUserLoading && user && firestore) {
-      // This is the staff layout. If a patient lands here, redirect them.
+      // This is the patient layout. If a staff member lands here, redirect them.
       const checkUserRole = async () => {
-        const patientRef = doc(firestore, 'patients', user.uid);
-        const patientSnap = await getDoc(patientRef);
-        if (patientSnap.exists()) {
-          redirect('/patient/dashboard');
+        const staffRef = doc(firestore, 'staff', user.uid);
+        const staffSnap = await getDoc(staffRef);
+        if (staffSnap.exists()) {
+          redirect('/dashboard');
         }
       };
       checkUserRole();
@@ -43,9 +43,9 @@ export default function AppLayout({
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
-      <MainSidebar />
+      <PatientSidebar />
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-        <Header />
+        <PatientHeader />
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
           {children}
         </main>
