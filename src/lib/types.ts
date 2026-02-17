@@ -1,5 +1,6 @@
 export type Patient = {
   id: string;
+  email: string;
   firstName: string;
   lastName: string;
   dateOfBirth: string;
@@ -20,6 +21,7 @@ export type Appointment = {
 
 export type Staff = {
   id: string;
+  email: string;
   firstName: string;
   lastName: string;
   role: "Doctor" | "Nurse" | "Admin" | "Surgeon";
@@ -43,7 +45,7 @@ export type UIPatient = Patient & {
 }
 
 export type UIAppointment = {
-  id: string;
+  id:string;
   patientName: string;
   doctorName: string;
   date: string;

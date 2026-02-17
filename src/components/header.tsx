@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
   Home,
@@ -14,7 +14,7 @@ import {
   BarChart3,
   PanelLeft,
   Hospital,
-  Database,
+  LogOut,
 } from 'lucide-react';
 import {
   Sheet,
@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
+import { useAuth, useUser } from '@/firebase';
 
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Dashboard' },
@@ -49,14 +50,21 @@ const navItems = [
   { href: '/staff', icon: FileText, label: 'Staff' },
   { href: '/smart-routing', icon: BrainCircuit, label: 'Smart Routing' },
   { href: '/reports', icon: BarChart3, label: 'Reports' },
-  { href: '/seed', icon: Database, label: 'Seed Data' },
 ];
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+  const auth = useAuth();
+  const { user } = useUser();
   const userAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar');
 
   const breadcrumbItem = navItems.find(item => pathname.startsWith(item.href));
+
+  const handleLogout = async () => {
+    await auth.signOut();
+    router.push('/login');
+  };
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
@@ -120,7 +128,7 @@ export function Header() {
             className="overflow-hidden rounded-full"
           >
             <Image
-              src={userAvatar?.imageUrl || "/placeholder-user.jpg"}
+              src={user?.photoURL || userAvatar?.imageUrl || "/placeholder-user.jpg"}
               width={36}
               height={36}
               alt="Avatar"
@@ -130,12 +138,15 @@ export function Header() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel>{user?.email || 'My Account'}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Logout</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Logout</span>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>

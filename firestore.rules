@@ -2,148 +2,87 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    /**
-     * Core Philosophy: This ruleset enforces a sophisticated Role-Based Access
-     * Control (RBAC) model combined with a strict user-ownership principle for
-     * patient-specific data. It distinguishes between Patients and various
-     * Staff roles (Admin, Doctor, etc.) to grant granular permissions.
-     *
-     * Data Structure: Primary entities like patients, staff, and departments
-     * are in top-level collections. Sensitive patient data, such as medical
-     * records and bills, are nested within subcollections under the specific
-     * patient's document (e.g., /patients/{patientId}/medicalRecords/{recordId}).
-     * This structure provides clear, path-based ownership. Global roles
-     * are managed in dedicated collections (e.g., /roles_admin) for efficient,
-     * database-wide permission checks.
-     *
-     * Key Security Decisions:
-     * - Default Deny: All access is denied unless explicitly granted.
-     * - Role Collections: /roles_admin and /roles_doctor collections act as
-     *   permission sets. A user's role is determined by the existence of a
-     *   document with their UID in one of these collections. These collections
-     *   are not client-writable.
-     * - Patient Data Privacy: A patient can only access data under their own
-     *   /patients/{patientId} path. Staff access to this data is restricted
-     *   to those with appropriate roles (Admin, Doctor) or a direct, documented
-     *   relationship (e.g., being the assigned doctor for an appointment).
-     * - Denormalization for Authorization: The rules are designed to avoid slow
-     *   and costly `get()` calls. For example, `appointment` documents contain
-     *   both `patientId` and `staffId`, and `notification` documents for a
-     *   department are expected to have a map of authorized staff UIDs. This
-     *   makes authorization checks fast and efficient.
-     * - Structural Segregation: Segregating patient-private data into
-     *   subcollections simplifies security. Publicly readable data (like
-     *   hospital services) is kept in separate top-level collections with
-     *   different security rules.
-     */
-
     // ----------------------------------------------------------------------
     // Helper Functions
     // ----------------------------------------------------------------------
 
-    /**
-     * Verifies the user is authenticated.
-     */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /**
-     * Verifies the requesting user's UID matches the provided userId.
-     * This is the foundation of the user-ownership model.
-     */
     function isOwner(userId) {
       return request.auth.uid == userId;
     }
 
-    /**
-     * Checks if the requesting user has global Admin privileges by checking for
-     * their document in the `roles_admin` collection.
-     */
     function isAdmin() {
-      // For demo purposes, allow all signed-in users to be admins.
-      // In a real app, you'd use: return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      // In a real app, this would be: return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      // For this demo, we grant admin rights to any signed-in user for ease of use.
       return isSignedIn();
     }
 
-    /**
-     * Checks if the requesting user has Doctor privileges by checking for
-     * their document in the `roles_doctor` collection.
-     */
     function isDoctor() {
-      // For demo purposes, allow all signed-in users to be doctors.
-      // In a real app, you'd use: return exists(/databases/$(database)/documents/roles_doctor/$(request.auth.uid));
+      // In a real app, this would be: return exists(/databases/$(database)/documents/roles_doctor/$(request.auth.uid));
+       // For this demo, we grant doctor rights to any signed-in user for ease of use.
       return isSignedIn();
     }
 
-    /**
-     * Checks if the user is a staff member.
-     */
     function isStaff() {
       return exists(/databases/$(database)/documents/staff/$(request.auth.uid));
     }
 
-    /**
-     * Ensures an existing document is being updated/deleted by an admin.
-     */
-    function isExistingAdmin() {
-      return isAdmin() && resource != null;
-    }
-
     // ----------------------------------------------------------------------
-    // Role-Defining Collections (Admin-managed)
+    // Role-Defining Collections (Should be Admin-managed server-side)
     // ----------------------------------------------------------------------
 
     match /roles_admin/{staffId} {
-      allow read, write: if false; // Managed server-side
+      allow read, write: if false; 
     }
 
     match /roles_doctor/{staffId} {
-      allow read, write: if false; // Managed server-side
+      allow read, write: if false;
     }
 
     // ----------------------------------------------------------------------
-    // Top-Level Collections
+    // Main Collections
     // ----------------------------------------------------------------------
 
     match /patients/{patientId} {
-      allow read: if true; // DEMO: Allow public read
-      allow create, update: if isOwner(patientId) || isAdmin();
+      allow create: if isOwner(patientId);
+      allow read, update: if isOwner(patientId) || isDoctor() || isAdmin();
       allow delete: if isAdmin();
 
-      // Subcollections
+      // Subcollections for Patient
       match /bills/{billId} {
-         allow read: if true; // DEMO: Allow public read
+         allow read: if isOwner(patientId) || isAdmin();
          allow create, update, delete: if isAdmin();
       }
       match /medicalRecords/{recordId} {
-        allow read: if true; // DEMO: Allow public read
+        allow read: if isOwner(patientId) || isDoctor() || isAdmin();
         allow create, update: if isDoctor() || isAdmin();
         allow delete: if isAdmin();
       }
     }
     
     match /staff/{staffId} {
-      allow read: if true; // DEMO: Allow public read
-      allow create: if isOwner(staffId) || isAdmin();
-      allow update: if isOwner(staffId) || isAdmin();
+      allow create: if isOwner(staffId);
+      allow read, update: if isOwner(staffId) || isAdmin();
       allow delete: if isAdmin();
     }
 
     match /departments/{departmentId} {
-      allow read: if true; // DEMO: Allow public read
+      allow read: if isSignedIn();
       allow create, update, delete: if isAdmin();
     }
 
     match /appointments/{appointmentId} {
-      allow read: if true; // DEMO: Allow public read
+      allow read: if isOwner(resource.data.patientId) || isOwner(resource.data.staffId) || isAdmin();
       allow create: if isSignedIn();
       allow update: if isOwner(resource.data.patientId) || isOwner(resource.data.staffId) || isAdmin();
       allow delete: if isAdmin();
     }
 
     match /services/{serviceId} {
-      allow read: if true; // DEMO: Allow public read
+      allow read: if isSignedIn();
       allow create, update, delete: if isAdmin();
     }
     
@@ -154,9 +93,9 @@ service cloud.firestore {
        allow update, delete: if isOwner(resource.data.recipientStaffId) || isAdmin();
     }
     
-    // Allow collection group query for bills for admins
+    // Collection group queries
     match /{path=**}/bills/{billId} {
-      allow read: if true; // DEMO: Allow public read
+      allow read: if isAdmin();
     }
   }
 }

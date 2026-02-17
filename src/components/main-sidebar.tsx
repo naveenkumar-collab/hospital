@@ -19,7 +19,6 @@ import {
   BarChart3,
   Settings,
   Hospital,
-  Database,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -31,7 +30,6 @@ const navItems = [
   { href: '/staff', icon: FileText, label: 'Staff' },
   { href: '/smart-routing', icon: BrainCircuit, label: 'Smart Routing' },
   { href: '/reports', icon: BarChart3, label: 'Reports' },
-  { href: '/seed', icon: Database, label: 'Seed Data' },
 ];
 
 export function MainSidebar() {
