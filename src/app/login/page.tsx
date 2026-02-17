@@ -62,29 +62,28 @@ export default function LoginPage() {
   const redirectUrl = searchParams.get('redirect') || '/dashboard';
   const { toast } = useToast();
 
-  useEffect(() => {
+  const handlePhoneSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!auth) return;
-    // Set up reCAPTCHA verifier
-    if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(
+    setIsLoading(true);
+    try {
+      // Ensure existing verifier is cleared before creating a new one.
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+      }
+
+      const appVerifier = new RecaptchaVerifier(
         auth,
         'recaptcha-container',
         {
-            size: 'invisible',
-            callback: () => {
+          size: 'invisible',
+          callback: () => {
             // reCAPTCHA solved, allow signInWithPhoneNumber.
-            },
+          },
         }
-        );
-    }
-  }, [auth]);
+      );
+      window.recaptchaVerifier = appVerifier;
 
-  const handlePhoneSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!auth || !window.recaptchaVerifier) return;
-    setIsLoading(true);
-    try {
-      const appVerifier = window.recaptchaVerifier;
       const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
       setConfirmationResult(result);
       setIsOtpSent(true);
@@ -100,13 +99,6 @@ export default function LoginPage() {
         title: 'Failed to send OTP',
         description: description,
       });
-      // Reset reCAPTCHA
-       if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.render().then((widgetId) => {
-          // @ts-ignore
-          window.grecaptcha.reset(widgetId);
-        });
-      }
     } finally {
       setIsLoading(false);
     }
