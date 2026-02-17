@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { UIPatient } from "@/lib/types"
+import { useRouter } from "next/navigation"
 
 export const columns: ColumnDef<UIPatient>[] = [
   {
@@ -43,10 +44,6 @@ export const columns: ColumnDef<UIPatient>[] = [
     header: "Gender",
   },
   {
-    accessorKey: "lastVisit",
-    header: "Last Visit",
-  },
-  {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
@@ -64,6 +61,7 @@ export const columns: ColumnDef<UIPatient>[] = [
     id: "actions",
     cell: ({ row }) => {
       const patient = row.original
+      const router = useRouter()
 
       return (
         <DropdownMenu>
@@ -81,7 +79,9 @@ export const columns: ColumnDef<UIPatient>[] = [
               Copy patient ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push(`/patients/${patient.id}`)}>
+              View details
+            </DropdownMenuItem>
             <DropdownMenuItem>Edit record</DropdownMenuItem>
             <DropdownMenuItem className="text-destructive">Delete record</DropdownMenuItem>
           </DropdownMenuContent>

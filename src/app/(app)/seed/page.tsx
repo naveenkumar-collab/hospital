@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { useFirestore } from '@/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
 import { patients as mockPatients, staff as mockStaff, appointments as mockAppointments, invoices as mockInvoices } from '@/lib/data';
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,28 +21,15 @@ export default function SeedPage() {
         try {
             // Seed patients
             for (const patient of mockPatients) {
-                const { id, name, age, ...patientData } = patient;
-                const nameParts = name.split(' ');
-                const firstName = nameParts[0];
-                const lastName = nameParts.slice(1).join(' ');
-                
-                const birthDate = new Date();
-                birthDate.setFullYear(birthDate.getFullYear() - age);
-                const dateOfBirth = birthDate.toISOString().split('T')[0];
-
+                const { id, ...patientData } = patient;
                 const patientRef = doc(firestore, 'patients', id);
-                setDocumentNonBlocking(patientRef, { 
-                    ...patientData,
-                    firstName, 
-                    lastName, 
-                    dateOfBirth 
-                }, { merge: true });
+                setDocumentNonBlocking(patientRef, patientData, { merge: true });
             }
             
             // Seed staff
             for (const staffMember of mockStaff) {
-                const { id, name, ...staffData } = staffMember;
-                const nameParts = name.replace('Dr. ', '').replace('Nurse ', '').split(' ');
+                 const { id, ...staffData } = staffMember;
+                const nameParts = staffMember.name.replace('Dr. ', '').replace('Nurse ', '').split(' ');
                 const firstName = nameParts[0];
                 const lastName = nameParts.slice(1).join(' ');
 
@@ -57,38 +44,30 @@ export default function SeedPage() {
 
             // Seed appointments
             for (const appointment of mockAppointments) {
-                const { id, patientName, doctorName, date, time, ...appointmentData } = appointment;
-                const patient = mockPatients.find(p => p.name === patientName);
-                const staffMember = mockStaff.find(s => s.name === doctorName);
-
-                if (patient && staffMember) {
-                    const appointmentDateTime = new Date(`${date} ${time}`).toISOString();
-                    const appointmentRef = doc(firestore, 'appointments', id);
-                    setDocumentNonBlocking(appointmentRef, {
-                        ...appointmentData,
-                        patientId: patient.id,
-                        staffId: staffMember.id,
-                        appointmentDateTime,
-                        departmentId: staffMember.department,
-                        reasonForVisit: "Checkup"
-                    }, { merge: true });
-                }
+                const { id, ...appointmentData } = appointment;
+                const appointmentDateTime = new Date(`${appointment.date} ${appointment.time}`).toISOString();
+                const appointmentRef = doc(firestore, 'appointments', id);
+                const staffMember = mockStaff.find(s => s.id === appointment.staffId);
+                setDocumentNonBlocking(appointmentRef, {
+                    patientId: appointmentData.patientId,
+                    staffId: appointmentData.staffId,
+                    status: appointmentData.status,
+                    appointmentDateTime,
+                    departmentId: staffMember?.department || "General",
+                    reasonForVisit: "Checkup"
+                }, { merge: true });
             }
 
             // Seed bills (invoices)
             for (const invoice of mockInvoices) {
-                const { id, patientName, amount, date, ...invoiceData } = invoice;
-                const patient = mockPatients.find(p => p.name === patientName);
-
-                if (patient) {
-                    const billRef = doc(firestore, 'patients', patient.id, 'bills', id);
-                    setDocumentNonBlocking(billRef, {
-                        ...invoiceData,
-                        patientId: patient.id,
-                        totalAmount: amount,
-                        billingDate: new Date(date).toISOString(),
-                    }, { merge: true });
-                }
+                const { id, patientId, amount, date, ...invoiceData } = invoice;
+                const billRef = doc(firestore, 'patients', patientId, 'bills', id);
+                setDocumentNonBlocking(billRef, {
+                    ...invoiceData,
+                    patientId: patientId,
+                    totalAmount: amount,
+                    billingDate: new Date(date).toISOString(),
+                }, { merge: true });
             }
 
             toast({ title: "Seeding complete!", description: "Database has been seeded with mock data." });

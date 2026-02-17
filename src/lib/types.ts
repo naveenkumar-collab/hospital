@@ -5,10 +5,24 @@ export type Patient = {
   lastName: string;
   dateOfBirth: string;
   gender: "Male" | "Female" | "Other";
-  lastVisit: string;
+  contactNumber: string;
+  address: string;
   status: "Active" | "Recovered" | "Deceased";
   avatar?: string;
+  bloodGroup?: string;
+  allergies?: string[];
+  medicalHistorySummary?: string;
 };
+
+export type MedicalRecord = {
+    id: string;
+    patientId: string;
+    staffId: string;
+    recordDateTime: string;
+    diagnosis: string;
+    treatment: string;
+    notes: string;
+}
 
 export type Appointment = {
   id: string;
@@ -52,6 +66,7 @@ export type UIAppointment = {
   date: string;
   time: string;
   status: "Scheduled" | "Completed" | "Cancelled";
+  reasonForVisit: string;
 }
 
 export type UIStaff = Staff & {

@@ -40,6 +40,21 @@
           "type": "string",
           "description": "The residential address of the patient."
         },
+        "bloodGroup": {
+          "type": "string",
+          "description": "The patient's blood group (e.g., 'A+', 'O-')."
+        },
+        "allergies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of the patient's known allergies."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the patient (e.g., 'Active', 'Recovered', 'Deceased')."
+        },
         "medicalHistorySummary": {
           "type": "string",
           "description": "A brief summary of the patient's general medical history."

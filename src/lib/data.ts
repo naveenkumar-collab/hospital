@@ -1,14 +1,14 @@
 
-import type { Patient, Staff, Appointment, Invoice } from "./types";
+import type { Patient, Staff, Appointment, Bill } from "./types";
 import { PlaceHolderImages } from "./placeholder-images";
 
 export const patients: Patient[] = [
-  { id: "MT001", name: "Alice Johnson", age: 45, gender: "Female", lastVisit: "2024-05-10", status: "Recovered" },
-  { id: "MT002", name: "Bob Williams", age: 62, gender: "Male", lastVisit: "2024-05-12", status: "Active" },
-  { id: "MT003", name: "Charlie Brown", age: 34, gender: "Male", lastVisit: "2024-04-22", status: "Active" },
-  { id: "MT004", name: "Diana Prince", age: 29, gender: "Female", lastVisit: "2024-05-15", status: "Active" },
-  { id: "MT005", name: "Ethan Hunt", age: 51, gender: "Male", lastVisit: "2024-03-30", status: "Recovered" },
-  { id: "MT006", name: "Fiona Glenanne", age: 38, gender: "Female", lastVisit: "2024-05-01", status: "Active" },
+  { id: "MT001", firstName: "Alice", lastName: "Johnson", dateOfBirth: "1979-05-10", gender: "Female", status: "Recovered", email: "alice.j@email.com", contactNumber: "555-0101", address: "123 Maple St, Springfield, USA", bloodGroup: "A+", allergies: ["Peanuts"], medicalHistorySummary: "History of hypertension, well-controlled with medication." },
+  { id: "MT002", firstName: "Bob", lastName: "Williams", dateOfBirth: "1962-08-15", gender: "Male", status: "Active", email: "bob.w@email.com", contactNumber: "555-0102", address: "456 Oak Ave, Springfield, USA", bloodGroup: "O-", allergies: [], medicalHistorySummary: "No significant medical history." },
+  { id: "MT003", firstName: "Charlie", lastName: "Brown", dateOfBirth: "1990-01-20", gender: "Male", status: "Active", email: "charlie.b@email.com", contactNumber: "555-0103", address: "789 Pine Ln, Springfield, USA", bloodGroup: "B+", allergies: ["Pollen"], medicalHistorySummary: "Seasonal allergies and asthma." },
+  { id: "MT004", firstName: "Diana", lastName: "Prince", dateOfBirth: "1995-06-25", gender: "Female", status: "Active", email: "diana.p@email.com", contactNumber: "555-0104", address: "101 Cherry Rd, Springfield, USA", bloodGroup: "AB+", allergies: ["Penicillin"], medicalHistorySummary: "Generally healthy." },
+  { id: "MT005", firstName: "Ethan", lastName: "Hunt", dateOfBirth: "1973-12-01", gender: "Male", status: "Recovered", email: "ethan.h@email.com", contactNumber: "555-0105", address: "212 Birch Blvd, Springfield, USA", bloodGroup: "A-", allergies: [], medicalHistorySummary: "Previous knee surgery in 2018." },
+  { id: "MT006", firstName: "Fiona", lastName: "Glenanne", dateOfBirth: "1986-11-18", gender: "Female", status: "Active", email: "fiona.g@email.com", contactNumber: "555-0106", address: "333 Elm Ct, Springfield, USA", bloodGroup: "O+", allergies: ["Shellfish"], medicalHistorySummary: "No chronic illnesses." },
 ];
 
 export const staff: Staff[] = [
@@ -22,20 +22,20 @@ export const staff: Staff[] = [
 
 const staticToday = "2024-05-27";
 
-export const appointments: Appointment[] = [
-  { id: "AP001", patientName: "Charlie Brown", doctorName: "Dr. Emily Carter", date: staticToday, time: "10:00 AM", status: "Scheduled" },
-  { id: "AP002", patientName: "Diana Prince", doctorName: "Dr. Ben Adams", date: staticToday, time: "11:30 AM", status: "Scheduled" },
-  { id: "AP003", patientName: "Alice Johnson", doctorName: "Dr. Jessica Lee", date: "2024-05-28", time: "02:00 PM", status: "Completed" },
-  { id: "AP004", patientName: "Bob Williams", doctorName: "Dr. Emily Carter", date: "2024-05-29", time: "09:00 AM", status: "Scheduled" },
+export const appointments: (Omit<Appointment, 'appointmentDateTime'> & { date: string; time: string;})[] = [
+  { id: "AP001", patientId: "MT003", staffId: "ST01", date: staticToday, time: "10:00 AM", status: "Scheduled", departmentId: "Cardiology", reasonForVisit: "Follow-up" },
+  { id: "AP002", patientId: "MT004", staffId: "ST02", date: staticToday, time: "11:30 AM", status: "Scheduled", departmentId: "Pediatrics", reasonForVisit: "Vaccination" },
+  { id: "AP003", patientId: "MT001", staffId: "ST04", date: "2024-05-28", time: "02:00 PM", status: "Completed", departmentId: "Neurology", reasonForVisit: "Headache consultation" },
+  { id: "AP004", patientId: "MT002", staffId: "ST01", date: "2024-05-29", time: "09:00 AM", status: "Scheduled", departmentId: "Cardiology", reasonForVisit: "Pre-op check" },
 ];
 
-export const invoices: Invoice[] = [
-  { id: "INV001", patientName: "Alice Johnson", amount: 250, date: "2024-05-10", status: "Paid" },
-  { id: "INV002", patientName: "Bob Williams", amount: 400, date: "2024-05-12", status: "Unpaid" },
-  { id: "INV003", patientName: "Charlie Brown", amount: 150, date: "2024-04-22", status: "Paid" },
-  { id: "INV004", patientName: "Diana Prince", amount: 75, date: "2024-05-15", status: "Unpaid" },
-  { id: "INV005", patientName: "Ethan Hunt", amount: 800, date: "2024-03-30", status: "Paid" },
-  { id: "INV006", patientName: "Fiona Glenanne", amount: 320, date: "2024-04-15", status: "Overdue" },
+export const invoices: (Omit<Bill, 'billingDate' | 'totalAmount'> & { patientId: string; amount: number; date: string;})[] = [
+  { id: "INV001", patientId: "MT001", amount: 250, date: "2024-05-10", status: "Paid" },
+  { id: "INV002", patientId: "MT002", amount: 400, date: "2024-05-12", status: "Unpaid" },
+  { id: "INV003", patientId: "MT003", amount: 150, date: "2024-04-22", status: "Paid" },
+  { id: "INV004", patientId: "MT004", amount: 75, date: "2024-05-15", status: "Unpaid" },
+  { id: "INV005", patientId: "MT005", amount: 800, date: "2024-03-30", status: "Paid" },
+  { id: "INV006", patientId: "MT006", amount: 320, date: "2024-04-15", status: "Overdue" },
 ];
 
 export const getTodaysAppointments = () => {
