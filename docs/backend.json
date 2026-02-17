@@ -1,0 +1,749 @@
+{
+  "entities": {
+    "Patient": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Patient",
+      "type": "object",
+      "description": "Represents a patient registered in the MediTrack system, storing their personal and basic medical information.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Patient entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the patient."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the patient."
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "description": "The patient's date of birth.",
+          "format": "date"
+        },
+        "gender": {
+          "type": "string",
+          "description": "The gender of the patient (e.g., 'Male', 'Female', 'Other')."
+        },
+        "contactNumber": {
+          "type": "string",
+          "description": "The primary contact number for the patient."
+        },
+        "email": {
+          "type": "string",
+          "description": "The patient's email address.",
+          "format": "email"
+        },
+        "address": {
+          "type": "string",
+          "description": "The residential address of the patient."
+        },
+        "medicalHistorySummary": {
+          "type": "string",
+          "description": "A brief summary of the patient's general medical history."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the patient record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the patient record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "dateOfBirth",
+        "contactNumber",
+        "email"
+      ]
+    },
+    "Staff": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Staff",
+      "type": "object",
+      "description": "Represents a staff member within the hospital, including doctors, nurses, and administrative personnel.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Staff entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the staff member."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the staff member."
+        },
+        "role": {
+          "type": "string",
+          "description": "The role of the staff member (e.g., 'Doctor', 'Nurse', 'Administrator', 'Receptionist')."
+        },
+        "specialization": {
+          "type": "string",
+          "description": "The medical specialization of the staff member, if applicable (e.g., 'Cardiologist', 'Pediatrician')."
+        },
+        "contactNumber": {
+          "type": "string",
+          "description": "The primary contact number for the staff member."
+        },
+        "email": {
+          "type": "string",
+          "description": "The staff member's email address.",
+          "format": "email"
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "Reference to the Department the staff member belongs to. (Relationship: Department 1:N Staff)"
+        },
+        "hireDate": {
+          "type": "string",
+          "description": "The date when the staff member was hired.",
+          "format": "date"
+        },
+        "scheduleDetails": {
+          "type": "string",
+          "description": "General notes or details about the staff member's work schedule."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the staff record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the staff record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "role",
+        "contactNumber",
+        "email",
+        "departmentId"
+      ]
+    },
+    "Department": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Department",
+      "type": "object",
+      "description": "Represents a specific department within the hospital (e.g., Cardiology, Radiology, Pediatrics).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Department entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the department."
+        },
+        "headOfDepartmentId": {
+          "type": "string",
+          "description": "Reference to the Staff member who is the head of this department. (Relationship: Staff 1:1 Department)"
+        },
+        "contactNumber": {
+          "type": "string",
+          "description": "The main contact number for the department."
+        },
+        "location": {
+          "type": "string",
+          "description": "The physical location or building/floor of the department."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the department's function."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the department record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the department record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Appointment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Appointment",
+      "type": "object",
+      "description": "Represents a scheduled appointment between a patient and a staff member (e.g., doctor).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Appointment entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to the Patient attending the appointment. (Relationship: Patient 1:N Appointment)"
+        },
+        "staffId": {
+          "type": "string",
+          "description": "Reference to the Staff member (e.g., doctor) conducting the appointment. (Relationship: Staff 1:N Appointment)"
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "Reference to the Department where the appointment is scheduled. (Relationship: Department 1:N Appointment)"
+        },
+        "appointmentDateTime": {
+          "type": "string",
+          "description": "The date and time of the scheduled appointment.",
+          "format": "date-time"
+        },
+        "reasonForVisit": {
+          "type": "string",
+          "description": "The primary reason for the patient's visit."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the appointment (e.g., 'Scheduled', 'Completed', 'Cancelled', 'Rescheduled')."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Any additional notes or details related to the appointment."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the appointment record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the appointment record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "staffId",
+        "departmentId",
+        "appointmentDateTime",
+        "reasonForVisit",
+        "status"
+      ]
+    },
+    "MedicalRecord": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MedicalRecord",
+      "type": "object",
+      "description": "Stores detailed medical history and clinical notes for a patient.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MedicalRecord entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to the Patient to whom this medical record belongs. (Relationship: Patient 1:N MedicalRecord)"
+        },
+        "staffId": {
+          "type": "string",
+          "description": "Reference to the Staff member who created or last updated this medical record. (Relationship: Staff 1:N MedicalRecord)"
+        },
+        "recordDateTime": {
+          "type": "string",
+          "description": "The date and time when this medical record entry was made.",
+          "format": "date-time"
+        },
+        "diagnosis": {
+          "type": "string",
+          "description": "The diagnosis made for the patient at this record entry."
+        },
+        "treatment": {
+          "type": "string",
+          "description": "The treatment plan prescribed or administered."
+        },
+        "medications": {
+          "type": "array",
+          "description": "A list of medications prescribed or administered.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allergies": {
+          "type": "array",
+          "description": "A list of known allergies for the patient.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "string",
+          "description": "Detailed clinical notes and observations."
+        },
+        "attachments": {
+          "type": "array",
+          "description": "References to URIs of attached documents or images (e.g., lab results, X-rays).",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the medical record entry was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the medical record entry was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "staffId",
+        "recordDateTime",
+        "diagnosis"
+      ]
+    },
+    "Service": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Service",
+      "type": "object",
+      "description": "Defines a specific medical service offered by the hospital, along with its pricing.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Service entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the service (e.g., 'Consultation Fee', 'MRI Scan', 'Blood Test')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the service."
+        },
+        "price": {
+          "type": "number",
+          "description": "The standard price of the service."
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "Reference to the Department that provides this service. (Relationship: Department 1:N Service)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the service record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the service record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "price",
+        "departmentId"
+      ]
+    },
+    "Bill": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Bill",
+      "type": "object",
+      "description": "Represents a consolidated bill for services rendered to a patient.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Bill entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to the Patient who is being billed. (Relationship: Patient 1:N Bill)"
+        },
+        "billingDate": {
+          "type": "string",
+          "description": "The date when the bill was generated.",
+          "format": "date"
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "The total amount due for all services on this bill."
+        },
+        "paidAmount": {
+          "type": "number",
+          "description": "The amount of the bill that has been paid."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current payment status of the bill (e.g., 'Pending', 'Paid', 'Partially Paid', 'Overdue')."
+        },
+        "dueDate": {
+          "type": "string",
+          "description": "The date by which the bill is expected to be paid.",
+          "format": "date"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Any additional notes or remarks about the bill."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the bill record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the bill record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "billingDate",
+        "totalAmount",
+        "status"
+      ]
+    },
+    "BillItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "BillItem",
+      "type": "object",
+      "description": "Represents a single line item within a patient's bill, linking to a specific service.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the BillItem entity."
+        },
+        "billId": {
+          "type": "string",
+          "description": "Reference to the Bill this item belongs to. (Relationship: Bill 1:N BillItem)"
+        },
+        "serviceId": {
+          "type": "string",
+          "description": "Reference to the Service provided. (Relationship: Service 1:N BillItem)"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "The quantity of the service provided."
+        },
+        "unitPrice": {
+          "type": "number",
+          "description": "The price of a single unit of the service at the time of billing."
+        },
+        "itemTotal": {
+          "type": "number",
+          "description": "The total cost for this specific bill item (quantity * unitPrice)."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Any specific notes for this bill item."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the bill item record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the bill item record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "billId",
+        "serviceId",
+        "quantity",
+        "unitPrice",
+        "itemTotal"
+      ]
+    },
+    "Notification": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Notification",
+      "type": "object",
+      "description": "Represents an internal notification or task for staff members or departments.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Notification entity."
+        },
+        "senderStaffId": {
+          "type": "string",
+          "description": "Reference to the Staff member who initiated the notification, if applicable. (Relationship: Staff 1:N Notification)"
+        },
+        "recipientStaffId": {
+          "type": "string",
+          "description": "Reference to the individual Staff member receiving the notification, if applicable. (Relationship: Staff 1:N Notification)"
+        },
+        "recipientDepartmentId": {
+          "type": "string",
+          "description": "Reference to the Department receiving the notification, if applicable. (Relationship: Department 1:N Notification)"
+        },
+        "message": {
+          "type": "string",
+          "description": "The content of the notification message."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of notification (e.g., 'Task', 'Information', 'Alert', 'AppointmentReminder')."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the notification (e.g., 'Sent', 'Delivered', 'Read', 'Archived', 'Completed')."
+        },
+        "relatedEntityId": {
+          "type": "string",
+          "description": "Generic reference to the ID of another entity related to this notification (e.g., a Patient ID, an Appointment ID)."
+        },
+        "relatedEntityType": {
+          "type": "string",
+          "description": "The type of entity referred to by relatedEntityId (e.g., 'Patient', 'Appointment', 'MedicalRecord')."
+        },
+        "priority": {
+          "type": "string",
+          "description": "The priority level of the notification (e.g., 'Low', 'Medium', 'High', 'Urgent')."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the notification was created.",
+          "format": "date-time"
+        },
+        "scheduledSendTime": {
+          "type": "string",
+          "description": "The scheduled date and time for the notification to be sent.",
+          "format": "date-time"
+        },
+        "readAt": {
+          "type": "string",
+          "description": "Timestamp when the notification was read by the recipient.",
+          "format": "date-time"
+        },
+        "dueDate": {
+          "type": "string",
+          "description": "The due date for a task-type notification.",
+          "format": "date"
+        },
+        "assignedToStaffId": {
+          "type": "string",
+          "description": "Reference to the Staff member assigned to complete a task-type notification. (Relationship: Staff 1:N Notification)"
+        },
+        "completedAt": {
+          "type": "string",
+          "description": "Timestamp when a task-type notification was completed.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "message",
+        "type",
+        "status"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/patients/{patientId}",
+        "definition": {
+          "entityName": "Patient",
+          "schema": {
+            "$ref": "#/backend/entities/Patient"
+          },
+          "description": "Main collection for patient profiles. Accessible by the patient themselves (path matches request.auth.uid), and globally by admin staff. Doctors and Nurses may have read access based on their roles."
+        }
+      },
+      {
+        "path": "/staff/{staffId}",
+        "definition": {
+          "entityName": "Staff",
+          "schema": {
+            "$ref": "#/backend/entities/Staff"
+          },
+          "description": "Main collection for staff profiles. Accessible by the staff member themselves (path matches request.auth.uid), and globally by admin staff. Other staff can typically read basic information for inter-departmental communication."
+        }
+      },
+      {
+        "path": "/departments/{departmentId}",
+        "definition": {
+          "entityName": "Department",
+          "schema": {
+            "$ref": "#/backend/entities/Department"
+          },
+          "description": "Collection for hospital departments. Read-only for most staff. Write/update access for admin staff or the specific headOfDepartmentId.",
+          "params": [
+            {
+              "name": "departmentId",
+              "description": "Unique identifier for the Department entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/appointments/{appointmentId}",
+        "definition": {
+          "entityName": "Appointment",
+          "schema": {
+            "$ref": "#/backend/entities/Appointment"
+          },
+          "description": "Scheduled appointments. Documents include 'patientId' and 'staffId' for authorization independence. Accessible by the patient (resource.data.patientId matches request.auth.uid) or the assigned staff member (resource.data.staffId matches request.auth.uid). Admin staff have global access.",
+          "params": [
+            {
+              "name": "appointmentId",
+              "description": "Unique identifier for the Appointment entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/patients/{patientId}/medicalRecords/{medicalRecordId}",
+        "definition": {
+          "entityName": "MedicalRecord",
+          "schema": {
+            "$ref": "#/backend/entities/MedicalRecord"
+          },
+          "description": "Detailed medical history and clinical notes for a specific patient. Patient ownership is derived from the path. Documents include 'staffId' for authorization independence of the creating/updating staff. Includes denormalized 'patientId' in the path for authorization independence.",
+          "params": [
+            {
+              "name": "patientId",
+              "description": "Unique identifier for the Patient to whom these medical records belong."
+            },
+            {
+              "name": "medicalRecordId",
+              "description": "Unique identifier for the MedicalRecord entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/services/{serviceId}",
+        "definition": {
+          "entityName": "Service",
+          "schema": {
+            "$ref": "#/backend/entities/Service"
+          },
+          "description": "Defines medical services offered by the hospital. Generally public read access, with write/update restricted to admin staff.",
+          "params": [
+            {
+              "name": "serviceId",
+              "description": "Unique identifier for the Service entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/patients/{patientId}/bills/{billId}",
+        "definition": {
+          "entityName": "Bill",
+          "schema": {
+            "$ref": "#/backend/entities/Bill"
+          },
+          "description": "Consolidated bills for a patient. Patient ownership is derived from the path. Accessible by the patient (path matches request.auth.uid) or admin staff. Includes denormalized 'patientId' in the path for authorization independence.",
+          "params": [
+            {
+              "name": "patientId",
+              "description": "Unique identifier for the Patient to whom this bill belongs."
+            },
+            {
+              "name": "billId",
+              "description": "Unique identifier for the Bill entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/patients/{patientId}/bills/{billId}/billItems/{billItemId}",
+        "definition": {
+          "entityName": "BillItem",
+          "schema": {
+            "$ref": "#/backend/entities/BillItem"
+          },
+          "description": "Individual line items within a patient's bill. Authorization is inherited from the parent Bill. Includes denormalized 'patientId' and 'billId' in the path for authorization independence.",
+          "params": [
+            {
+              "name": "patientId",
+              "description": "Unique identifier for the Patient to whom this bill item's parent bill belongs."
+            },
+            {
+              "name": "billId",
+              "description": "Unique identifier for the Bill this item belongs to."
+            },
+            {
+              "name": "billItemId",
+              "description": "Unique identifier for the BillItem entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/notifications/{notificationId}",
+        "definition": {
+          "entityName": "Notification",
+          "schema": {
+            "$ref": "#/backend/entities/Notification"
+          },
+          "description": "Internal notifications or tasks for staff members or departments. Documents include 'senderStaffId' and 'recipientStaffId' for direct authorization. For department-wide notifications ('recipientDepartmentId' set), a denormalized 'authorizedDepartmentStaffIds: {staffId: true, ...}' map is included to enable authorization independence without 'get()' calls in rules. This map must be maintained by a Cloud Function.",
+          "params": [
+            {
+              "name": "notificationId",
+              "description": "Unique identifier for the Notification entity."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{staffId}",
+        "definition": {
+          "entityName": "Staff",
+          "schema": {
+            "$ref": "#/backend/entities/Staff"
+          },
+          "description": "A dedicated collection for identifying staff members with global administrative privileges. Authorization is based on the existence of a document with the user's UID (DBAC - Existence over Content).",
+          "params": [
+            {
+              "name": "staffId",
+              "description": "The UID of the staff member with administrative privileges."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_doctor/{staffId}",
+        "definition": {
+          "entityName": "Staff",
+          "schema": {
+            "$ref": "#/backend/entities/Staff"
+          },
+          "description": "A dedicated collection for identifying staff members with global doctor privileges. Used to grant broader read access to medical records. Authorization is based on the existence of a document with the user's UID (DBAC - Existence over Content).",
+          "params": [
+            {
+              "name": "staffId",
+              "description": "The UID of the staff member with doctor privileges."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure for MediTrack is designed with a strong emphasis on Authorization Independence, Structural Segregation, and consistent Access Modeling to ensure robust security rules and efficient queries. The core strategy is to denormalize authorization context directly into documents, eliminating the need for `get()` calls in security rules for checking associated data, thereby enhancing rule simplicity, debuggability, and support for atomic operations.\n\n**Authorization Independence & Denormalization:**\n*   For entities like `MedicalRecord`, `Bill`, and `BillItem` which are tightly bound to a `Patient`, they are structured as subcollections under `/patients/{patientId}/...`. This inherently denormalizes `patientId` into the path, making ownership checks (`request.auth.uid == patientId`) straightforward and `get()`-free.\n*   For `Appointment` documents, `patientId` and `staffId` are explicitly included in the document. This allows a patient to access their own appointments (`resource.data.patientId == request.auth.uid`) and a staff member to access their assigned appointments (`resource.data.staffId == request.auth.uid`) without needing to perform `get()` operations on other documents.\n*   For `Notification` documents, which can target individual staff or entire departments, the `recipientStaffId` is directly in the document for individual access. For department-wide notifications, a new denormalized field, `authorizedDepartmentStaffIds`, is proposed. This field would be a map (`{staffId1: true, staffId2: true}`) containing all `staffId`s belonging to the `recipientDepartmentId`. This crucial denormalization ensures that authorization for department notifications can be checked directly within the `Notification` document (`resource.data.authorizedDepartmentStaffIds[request.auth.uid] == true`), completely avoiding `get()` calls to the `staff` or `department` collections in the rules. This requires a Cloud Function to populate and maintain this map when staff join/leave departments or when department-targeted notifications are created.\n\n**Structural Segregation & QAPs (Queries as Authorization Primitives):**\n*   Each primary entity (`Patient`, `Staff`, `Department`, `Service`) gets its own top-level collection. This ensures homogeneous security posture within each collection. For example, all documents in `/patients` share the primary security requirement that a patient can only manage their own profile, while admin staff can manage all. This simplifies `list` operations (QAPs) because rules can be applied uniformly.\n*   Global roles (`roles_admin`, `roles_doctor`) are implemented using dedicated collections. Existence checks (`exists(/roles_admin/$(request.auth.uid))`) are used to grant broad access, enabling efficient `list` operations for administrative or specialized staff without complex `get()` chains.\n*   The structure supports QAPs by allowing users to efficiently query for data they are authorized to access: e.g., a patient can query `/patients/{request.auth.uid}/appointments` (or `/appointments` with `where patientId == request.auth.uid`), a staff member can query `/appointments` with `where staffId == request.auth.uid`, and administrative staff (identified by `roles_admin/{uid}`) can `list` all documents in relevant collections.\n\n**Access Modeling & Data Clarity:**\n*   **Private Data:** Path-based ownership is used for patient-specific nested data (`/patients/{patientId}/medicalRecords`, `/patients/{patientId}/bills`, `/patients/{patientId}/bills/{billId}/billItems`). This provides clear ownership and simplifies rules.\n*   **Collaborative Data:** While direct membership maps aren't used for `Department` documents themselves, the concept is applied to `Notification` through the denormalized `authorizedDepartmentStaffIds` map for department-level collaboration. For general collaborative documents like `Appointment`, `patientId` and `staffId` fields facilitate authorization.\n*   **Global Roles (DBAC):** Dedicated `roles_admin/{staffId}` and `roles_doctor/{staffId}` collections are used. This makes global role assignments explicit and rule evaluation simple, based on document existence.\n\nThis design prioritizes secure, scalable, and debuggable Firestore rules by making authorization intent explicit through careful structural choices and strategic denormalization, fully adhering to the core design principles."
+  }
+}
