@@ -44,18 +44,21 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
       const user = userCredential.user;
       
-      await updateProfile(user, { displayName: `${firstName} ${lastName}` });
+      const trimmedFirstName = firstName.trim();
+      const trimmedLastName = lastName.trim();
+
+      await updateProfile(user, { displayName: `${trimmedFirstName} ${trimmedLastName}` });
 
       if (role === 'patient') {
         const patientRef = doc(firestore, 'patients', user.uid);
         await setDoc(patientRef, {
           id: user.uid,
-          firstName,
-          lastName,
-          email,
+          firstName: trimmedFirstName,
+          lastName: trimmedLastName,
+          email: email.trim(),
           dateOfBirth: '1990-01-01', // Default value
           gender: 'Other', // Default value
           contactNumber: 'N/A',
@@ -68,9 +71,9 @@ export default function SignupPage() {
         const staffRef = doc(firestore, 'staff', user.uid);
         await setDoc(staffRef, {
           id: user.uid,
-          firstName,
-          lastName,
-          email,
+          firstName: trimmedFirstName,
+          lastName: trimmedLastName,
+          email: email.trim(),
           role: 'Doctor', // Default role for new staff
           departmentId: 'General', // Default department
           avatar: `https://picsum.photos/seed/${user.uid}/120/120`,
