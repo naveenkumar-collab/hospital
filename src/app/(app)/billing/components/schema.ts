@@ -5,7 +5,7 @@ export const invoiceSchema = z.object({
   patientName: z.string(),
   amount: z.number(),
   date: z.string(),
-  status: z.enum(["Paid", "Unpaid", "Overdue"]),
+  status: z.enum(["Paid", "Unpaid", "Overdue", "Pending", "Partially Paid"]),
 })
 
 export type InvoiceSchema = z.infer<typeof invoiceSchema>

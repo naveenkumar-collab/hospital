@@ -14,6 +14,7 @@ import {
   BarChart3,
   PanelLeft,
   Hospital,
+  Database,
 } from 'lucide-react';
 import {
   Sheet,
@@ -48,6 +49,7 @@ const navItems = [
   { href: '/staff', icon: FileText, label: 'Staff' },
   { href: '/smart-routing', icon: BrainCircuit, label: 'Smart Routing' },
   { href: '/reports', icon: BarChart3, label: 'Reports' },
+  { href: '/seed', icon: Database, label: 'Seed Data' },
 ];
 
 export function Header() {

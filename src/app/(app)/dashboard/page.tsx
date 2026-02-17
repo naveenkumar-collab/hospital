@@ -21,12 +21,12 @@ import {
   Users,
   CalendarCheck,
 } from "lucide-react";
-import { appointments, patients, invoices, getTodaysAppointments } from "@/lib/data";
 import { Bar, BarChart, CartesianGrid, XAxis, ResponsiveContainer, Line, LineChart } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-
-const totalRevenue = invoices.filter(i => i.status === 'Paid').reduce((acc, i) => acc + i.amount, 0);
-const todaysAppointments = getTodaysAppointments();
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import type { Appointment, Patient, Bill, Staff, UIAppointment } from "@/lib/types";
+import { collection, collectionGroup, query } from "firebase/firestore";
+import { format, isToday } from "date-fns";
 
 const chartData = [
   { month: "January", revenue: 12340 },
@@ -48,6 +48,37 @@ const appointmentChartData = [
 
 
 export default function DashboardPage() {
+  const firestore = useFirestore();
+
+  const patientsCollection = useMemoFirebase(() => (firestore ? collection(firestore, 'patients') : null), [firestore]);
+  const { data: patientData } = useCollection<Patient>(patientsCollection);
+  
+  const billsQuery = useMemoFirebase(() => (firestore ? query(collectionGroup(firestore, 'bills')) : null), [firestore]);
+  const { data: billData } = useCollection<Bill>(billsQuery);
+
+  const appointmentsCollection = useMemoFirebase(() => (firestore ? collection(firestore, 'appointments') : null), [firestore]);
+  const { data: appointmentData } = useCollection<Appointment>(appointmentsCollection);
+
+  const staffCollection = useMemoFirebase(() => firestore ? collection(firestore, 'staff') : null, [firestore]);
+  const { data: staffData } = useCollection<Staff>(staffCollection);
+
+
+  const totalRevenue = billData?.filter(i => i.status === 'Paid').reduce((acc, i) => acc + i.totalAmount, 0) || 0;
+  
+  const todaysAppointments: UIAppointment[] = appointmentData?.filter(a => isToday(new Date(a.appointmentDateTime)))
+    .map(a => {
+      const patient = patientData?.find(p => p.id === a.patientId);
+      const staff = staffData?.find(s => s.id === a.staffId);
+      const apptDateTime = new Date(a.appointmentDateTime);
+      return {
+        ...a,
+        patientName: patient ? `${patient.firstName} ${patient.lastName}` : 'Unknown',
+        doctorName: staff ? `Dr. ${staff.firstName} ${staff.lastName}` : 'Unknown',
+        date: format(apptDateTime, 'yyyy-MM-dd'),
+        time: format(apptDateTime, 'p'),
+      };
+    }) || [];
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
       <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
@@ -68,7 +99,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Active Patients</CardDescription>
-            <CardTitle className="text-4xl">{patients.filter(p => p.status === 'Active').length}</CardTitle>
+            <CardTitle className="text-4xl">{patientData?.filter(p => p.status === 'Active').length || 0}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-xs text-muted-foreground">
@@ -86,7 +117,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-xs text-muted-foreground">
-              {appointments.filter(a => a.status === 'Completed').length} completed
+              {appointmentData?.filter(a => a.status === 'Completed').length || 0} completed
             </div>
           </CardContent>
           <div className="absolute right-4 top-4 text-muted-foreground">

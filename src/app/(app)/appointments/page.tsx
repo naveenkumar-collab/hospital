@@ -18,17 +18,42 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
-import { appointments } from "@/lib/data";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import type { Appointment, Patient, Staff, UIAppointment } from '@/lib/types';
+import { format } from 'date-fns';
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AppointmentsPage() {
-  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const firestore = useFirestore();
 
-  useEffect(() => {
-    setSelectedDate(new Date());
-  }, []);
+  const appointmentsCollection = useMemoFirebase(() => firestore ? collection(firestore, 'appointments') : null, [firestore]);
+  const { data: appointmentData, isLoading: isLoadingAppointments } = useCollection<Appointment>(appointmentsCollection);
+
+  const patientsCollection = useMemoFirebase(() => firestore ? collection(firestore, 'patients') : null, [firestore]);
+  const { data: patientData, isLoading: isLoadingPatients } = useCollection<Patient>(patientsCollection);
+
+  const staffCollection = useMemoFirebase(() => firestore ? collection(firestore, 'staff') : null, [firestore]);
+  const { data: staffData, isLoading: isLoadingStaff } = useCollection<Staff>(staffCollection);
+
+  const mappedData: UIAppointment[] = appointmentData?.map(a => {
+    const patient = patientData?.find(p => p.id === a.patientId);
+    const staff = staffData?.find(s => s.id === a.staffId);
+    const apptDateTime = new Date(a.appointmentDateTime);
+    return {
+      ...a,
+      patientName: patient ? `${patient.firstName} ${patient.lastName}` : 'Unknown',
+      doctorName: staff ? `Dr. ${staff.firstName} ${staff.lastName}` : 'Unknown',
+      date: format(apptDateTime, 'yyyy-MM-dd'),
+      time: format(apptDateTime, 'p'),
+    };
+  }) || [];
+
+  const isLoading = isLoadingAppointments || isLoadingPatients || isLoadingStaff;
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-8">
@@ -41,6 +66,14 @@ export default function AppointmentsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {isLoading ? (
+              <div className="space-y-4">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+              </div>
+            ) : (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -55,7 +88,7 @@ export default function AppointmentsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {appointments.map((appointment) => (
+                {mappedData.map((appointment) => (
                   <TableRow key={appointment.id}>
                     <TableCell className="font-medium">{appointment.patientName}</TableCell>
                     <TableCell>{appointment.doctorName}</TableCell>
@@ -85,6 +118,7 @@ export default function AppointmentsPage() {
                 ))}
               </TableBody>
             </Table>
+            )}
           </CardContent>
         </Card>
       </div>

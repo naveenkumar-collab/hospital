@@ -13,9 +13,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { Invoice } from "@/lib/types"
+import { UIInvoice } from "@/lib/types"
 
-export const columns: ColumnDef<Invoice>[] = [
+export const columns: ColumnDef<UIInvoice>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => {
@@ -59,7 +59,9 @@ export const columns: ColumnDef<Invoice>[] = [
       const variant = {
         "Paid": "default",
         "Unpaid": "secondary",
+        "Pending": "secondary",
         "Overdue": "destructive",
+        "Partially Paid": "outline"
       }[status] ?? "outline" as "default" | "secondary" | "destructive" | "outline";
 
       return <Badge variant={variant}>{status}</Badge>

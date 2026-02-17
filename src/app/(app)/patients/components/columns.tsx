@@ -13,9 +13,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { Patient } from "@/lib/types"
+import { UIPatient } from "@/lib/types"
 
-export const columns: ColumnDef<Patient>[] = [
+export const columns: ColumnDef<UIPatient>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => {
