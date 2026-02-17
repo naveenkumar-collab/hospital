@@ -121,10 +121,14 @@ export default function SignupPage() {
       router.push('/dashboard');
     } catch (error: any) {
       console.error(error);
+      let description = error.message;
+      if (error.code === 'auth/operation-not-allowed') {
+        description = "This sign-in method is not enabled. Please enable it in your Firebase console under Authentication > Sign-in method.";
+      }
       toast({
         variant: "destructive",
         title: "Sign up with Google failed",
-        description: error.message,
+        description: description,
       });
     } finally {
       setIsGoogleLoading(false);
