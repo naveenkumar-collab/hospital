@@ -105,8 +105,8 @@ export default function DashboardPage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Active Patients</CardDescription>
-            <CardTitle className="text-4xl">{patientData?.filter(p => p.status === 'Active').length || 0}</CardTitle>
+            <CardDescription>Total Patients</CardDescription>
+            <CardTitle className="text-4xl">{patientData?.length || 0}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-xs text-muted-foreground">
