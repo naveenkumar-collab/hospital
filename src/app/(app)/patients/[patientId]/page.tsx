@@ -11,6 +11,7 @@ import { User, Phone, Home, Mail, Droplet, ShieldAlert, FileText, Calendar as Ca
 import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { useState, useEffect } from 'react';
 
 function calculateAge(dateOfBirth: string): number {
   const birthDate = new Date(dateOfBirth);
@@ -28,6 +29,8 @@ export default function PatientDetailPage() {
   const patientId = params.patientId as string;
   const firestore = useFirestore();
 
+  const [age, setAge] = useState<number | null>(null);
+
   // Fetch Patient Data
   const patientRef = useMemoFirebase(() => (firestore && patientId ? doc(firestore, 'patients', patientId) : null), [firestore, patientId]);
   const { data: patient, isLoading: isLoadingPatient } = useDoc<Patient>(patientRef);
@@ -43,6 +46,12 @@ export default function PatientDetailPage() {
   // Fetch Staff Data for doctor names
   const staffCollection = useMemoFirebase(() => firestore ? collection(firestore, 'staff') : null, [firestore]);
   const { data: staffData, isLoading: isLoadingStaff } = useCollection<Staff>(staffCollection);
+
+  useEffect(() => {
+    if (patient) {
+      setAge(calculateAge(patient.dateOfBirth));
+    }
+  }, [patient]);
 
 
   const isLoading = isLoadingPatient || isLoadingAppointments || isLoadingMedicalRecords || isLoadingStaff;
@@ -86,8 +95,6 @@ export default function PatientDetailPage() {
     return <div className="text-center">Patient not found.</div>;
   }
 
-  const age = calculateAge(patient.dateOfBirth);
-
   return (
     <div className="space-y-6">
       <Card>
@@ -105,7 +112,7 @@ export default function PatientDetailPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
             <div className="flex items-center gap-3">
               <User className="h-5 w-5 text-muted-foreground" />
-              <span>{age} years old, {patient.gender}</span>
+              <span>{age !== null ? `${age} years old, ${patient.gender}` : <Skeleton className="h-4 w-32" />}</span>
             </div>
             <div className="flex items-center gap-3">
               <Phone className="h-5 w-5 text-muted-foreground" />
