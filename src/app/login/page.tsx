@@ -50,6 +50,7 @@ export default function LoginPage() {
       if (staffSnap.exists()) {
         router.push(redirectUrl.startsWith('/patient') ? '/dashboard' : redirectUrl);
       } else {
+        // This case is unlikely if only staff use this page, but good for safety
         router.push(redirectUrl.startsWith('/patient') ? redirectUrl : '/patient/dashboard');
       }
 
@@ -81,6 +82,7 @@ export default function LoginPage() {
       if (staffSnap.exists()) {
         router.push(redirectUrl.startsWith('/patient') ? '/dashboard' : redirectUrl);
       } else {
+        // If a non-staff user signs in via Google here, create a patient record for them.
         const patientRef = doc(firestore, 'patients', user.uid);
         const patientSnap = await getDoc(patientRef);
 
@@ -101,7 +103,7 @@ export default function LoginPage() {
             avatar: user.photoURL || `https://picsum.photos/seed/${user.uid}/120/120`,
           });
         }
-        router.push(redirectUrl.startsWith('/patient') ? redirectUrl : '/patient/dashboard');
+        router.push('/patient/dashboard');
       }
     } catch (error: any) {
       console.error(error);
@@ -124,9 +126,9 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardTitle className="text-2xl">Staff Login</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account.
+            Enter your credentials below to access the admin dashboard.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSignIn}>
@@ -136,7 +138,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="staff@example.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -176,9 +178,14 @@ export default function LoginPage() {
             Sign in with Google
           </Button>
         </CardContent>
-        <CardFooter className="flex-col items-start">
-          <div className="text-center text-sm w-full">
-            Don&apos;t have an account?{' '}
+        <CardFooter className="flex-col items-center gap-2">
+           <div className="text-center text-sm">
+            <Link href={`/${searchParams.toString()}`} className="underline">
+              Are you a patient? Go back.
+            </Link>
+          </div>
+          <div className="text-center text-sm">
+            Don&apos;t have a staff account?{' '}
             <Link href="/signup" className="underline">
               Sign up
             </Link>
