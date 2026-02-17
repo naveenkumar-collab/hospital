@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -49,6 +50,7 @@ const appointmentChartData = [
 
 export default function DashboardPage() {
   const firestore = useFirestore();
+  const [todaysAppointments, setTodaysAppointments] = useState<UIAppointment[]>([]);
 
   const patientsCollection = useMemoFirebase(() => (firestore ? collection(firestore, 'patients') : null), [firestore]);
   const { data: patientData } = useCollection<Patient>(patientsCollection);
@@ -65,19 +67,24 @@ export default function DashboardPage() {
 
   const totalRevenue = billData?.filter(i => i.status === 'Paid').reduce((acc, i) => acc + i.totalAmount, 0) || 0;
   
-  const todaysAppointments: UIAppointment[] = appointmentData?.filter(a => isToday(new Date(a.appointmentDateTime)))
-    .map(a => {
-      const patient = patientData?.find(p => p.id === a.patientId);
-      const staff = staffData?.find(s => s.id === a.staffId);
-      const apptDateTime = new Date(a.appointmentDateTime);
-      return {
-        ...a,
-        patientName: patient ? `${patient.firstName} ${patient.lastName}` : 'Unknown',
-        doctorName: staff ? `Dr. ${staff.firstName} ${staff.lastName}` : 'Unknown',
-        date: format(apptDateTime, 'yyyy-MM-dd'),
-        time: format(apptDateTime, 'p'),
-      };
-    }) || [];
+  useEffect(() => {
+    if (appointmentData && patientData && staffData) {
+      const filteredAppointments = appointmentData?.filter(a => isToday(new Date(a.appointmentDateTime)))
+        .map(a => {
+          const patient = patientData?.find(p => p.id === a.patientId);
+          const staff = staffData?.find(s => s.id === a.staffId);
+          const apptDateTime = new Date(a.appointmentDateTime);
+          return {
+            ...a,
+            patientName: patient ? `${patient.firstName} ${patient.lastName}` : 'Unknown',
+            doctorName: staff ? `Dr. ${staff.firstName} ${staff.lastName}` : 'Unknown',
+            date: format(apptDateTime, 'yyyy-MM-dd'),
+            time: format(apptDateTime, 'p'),
+          };
+        }) || [];
+      setTodaysAppointments(filteredAppointments);
+    }
+  }, [appointmentData, patientData, staffData]);
 
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">

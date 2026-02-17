@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import { columns } from './components/columns';
@@ -28,16 +29,23 @@ export default function PatientsPage() {
     patientsCollection
   );
 
-  const mappedData: UIPatient[] =
-    patientData?.map((p) => ({
-      ...p,
-      name: `${p.firstName} ${p.lastName}`,
-      age: calculateAge(p.dateOfBirth),
-    })) || [];
+  const [mappedData, setMappedData] = useState<UIPatient[]>([]);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (patientData) {
+      setMappedData(
+        patientData.map((p) => ({
+          ...p,
+          name: `${p.firstName} ${p.lastName}`,
+          age: calculateAge(p.dateOfBirth),
+        }))
+      );
+    }
+  }, [patientData]);
+
+  if (isLoading && mappedData.length === 0) {
     return (
-       <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex">
+      <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex">
         <div className="flex items-center justify-between space-y-2">
           <div>
             <Skeleton className="h-8 w-64" />
@@ -46,7 +54,7 @@ export default function PatientsPage() {
         </div>
         <Skeleton className="h-96 w-full" />
       </div>
-    )
+    );
   }
 
   return (

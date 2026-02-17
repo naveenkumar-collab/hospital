@@ -28,8 +28,12 @@ import { format } from 'date-fns';
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AppointmentsPage() {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const firestore = useFirestore();
+
+  useEffect(() => {
+    setSelectedDate(new Date());
+  }, []);
 
   const appointmentsCollection = useMemoFirebase(() => firestore ? collection(firestore, 'appointments') : null, [firestore]);
   const { data: appointmentData, isLoading: isLoadingAppointments } = useCollection<Appointment>(appointmentsCollection);
