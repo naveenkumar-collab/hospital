@@ -66,21 +66,24 @@ export default function LoginPage() {
     e.preventDefault();
     if (!auth) return;
     setIsLoading(true);
+    
     try {
-      let appVerifier = window.recaptchaVerifier;
-      if (!appVerifier) {
-        appVerifier = new RecaptchaVerifier(
-          auth,
-          'recaptcha-container',
-          {
-            size: 'invisible',
-            callback: () => {
-              // reCAPTCHA solved, allow signInWithPhoneNumber.
-            },
-          }
-        );
-        window.recaptchaVerifier = appVerifier;
+      // Ensure any old verifier is cleared before creating a new one.
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
       }
+
+      const appVerifier = new RecaptchaVerifier(
+        auth,
+        'recaptcha-container',
+        {
+          size: 'invisible',
+          callback: () => {
+            // reCAPTCHA solved, allow signInWithPhoneNumber.
+          },
+        }
+      );
+      window.recaptchaVerifier = appVerifier;
 
       const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
       setConfirmationResult(result);
