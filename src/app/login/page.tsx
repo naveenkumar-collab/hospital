@@ -67,22 +67,20 @@ export default function LoginPage() {
     if (!auth) return;
     setIsLoading(true);
     try {
-      // Ensure existing verifier is cleared before creating a new one.
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
+      let appVerifier = window.recaptchaVerifier;
+      if (!appVerifier) {
+        appVerifier = new RecaptchaVerifier(
+          auth,
+          'recaptcha-container',
+          {
+            size: 'invisible',
+            callback: () => {
+              // reCAPTCHA solved, allow signInWithPhoneNumber.
+            },
+          }
+        );
+        window.recaptchaVerifier = appVerifier;
       }
-
-      const appVerifier = new RecaptchaVerifier(
-        auth,
-        'recaptcha-container',
-        {
-          size: 'invisible',
-          callback: () => {
-            // reCAPTCHA solved, allow signInWithPhoneNumber.
-          },
-        }
-      );
-      window.recaptchaVerifier = appVerifier;
 
       const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
       setConfirmationResult(result);
