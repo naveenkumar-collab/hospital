@@ -98,7 +98,7 @@ export default function LoginPage() {
             contactNumber: user.phoneNumber || 'N/A',
             address: 'N/A',
             status: 'Active',
-            avatar: user.photoURL,
+            avatar: user.photoURL || `https://picsum.photos/seed/${user.uid}/120/120`,
           });
         }
         router.push(redirectUrl.startsWith('/patient') ? redirectUrl : '/patient/dashboard');

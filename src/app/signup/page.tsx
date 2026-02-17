@@ -99,19 +99,28 @@ export default function SignupPage() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // By default, a Google Sign-In user is a patient unless they are already in the staff list
-      const staffRef = doc(firestore, 'staff', user.uid);
-      const staffSnap = await getDoc(staffRef);
+      const [firstName, ...lastNameParts] = user.displayName?.split(' ') || [];
+      const lastName = lastNameParts.join(' ');
 
-      if (staffSnap.exists()) {
+      if (role === 'staff') {
+        const staffRef = doc(firestore, 'staff', user.uid);
+        const staffSnap = await getDoc(staffRef);
+        if (!staffSnap.exists()) {
+          await setDoc(staffRef, {
+            id: user.uid,
+            firstName: firstName || 'New',
+            lastName: lastName || 'Staff',
+            email: user.email,
+            role: 'Doctor', // Default role
+            departmentId: 'General', // Default department
+            avatar: user.photoURL || `https://picsum.photos/seed/${user.uid}/120/120`,
+          });
+        }
         router.push('/dashboard');
-      } else {
+      } else { // 'patient'
         const patientRef = doc(firestore, 'patients', user.uid);
         const patientSnap = await getDoc(patientRef);
         if (!patientSnap.exists()) {
-          const [firstName, ...lastNameParts] = user.displayName?.split(' ') || [];
-          const lastName = lastNameParts.join(' ');
-          
           await setDoc(patientRef, {
             id: user.uid,
             firstName: firstName || 'New',
@@ -122,7 +131,7 @@ export default function SignupPage() {
             contactNumber: user.phoneNumber || 'N/A',
             address: 'N/A',
             status: 'Active',
-            avatar: user.photoURL,
+            avatar: user.photoURL || `https://picsum.photos/seed/${user.uid}/120/120`,
           });
         }
         router.push('/patient/dashboard');
